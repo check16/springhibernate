@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<security:http use-expressions="true">
+
+		<security:intercept-url pattern="/" access="permitAll" />
+		<security:intercept-url pattern="/login"
+			access="permitAll" />
+
+		<security:intercept-url pattern="/usuario/**"
+			access="isAuthenticated()" />
+
+		<security:intercept-url pattern="/about"
+			access="isAuthenticated()" />
+
+		<security:intercept-url pattern="/admin"
+			access="isAuthenticated()" />
+
+		<security:intercept-url pattern="/admin/**"
+			access="hasAnyRole({'ROLE_ROOT', 'ROLE_ADMIN'})" />
+
+		<security:intercept-url pattern="/direccion/**"
+			access="hasRole('ROLE_ADMIN')" />
+
+		<security:intercept-url pattern="/**" access="denyAll" />
+		<security:form-login login-page="/login"
+			password-parameter="clave" username-parameter="usuario"
+			authentication-failure-url="/login?error=true" />
+
+		<security:csrf disabled="true" />
+
+		<security:logout invalidate-session="true" logout-url="/logout"
+			logout-success-url="/" />
+
+
+		<security:remember-me
+			user-service-ref="customUserDetailsService"
+			remember-me-cookie="rememberCookie"
+			remember-me-parameter="remember-me" token-validity-seconds="60" />
+			
+	</security:http>
+
+	<security:authentication-manager>
+		<security:authentication-provider
+			ref="customAuthenticationProvider" />
+	</security:authentication-manager>
+
+	<bean id="customAuthenticationProvider" class="com.asanast.config.CustomAuthenticationProvider" />
+
+	<bean id="customUserDetailsService" class="com.asanast.config.CustomUserDetailsService" />
+
+	<bean id="bcryptEncoder"
+		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+	</bean>
+	
+</beans>
